@@ -2049,7 +2049,8 @@ class Dbgereum:
         elif command == 0x51:
             try:
                 index = int(self.stack.pop(), 16)
-                self.stack.append(self.memory[index])
+                value = ''.join(self.memory[index: index + 32])
+                self.stack.append(value)
                 self.memory_size -= 32
                 self.ip += 1
             except:
@@ -2092,7 +2093,7 @@ class Dbgereum:
         elif command == 0x54:
             try:
                 key = int(self.stack.pop(), 16)
-                for i in range(len(self.storage) - 1, 0, -1):
+                for i in range(len(self.storage) - 1, -1, -1):
                     if int(self.storage[i].split(":")[0], 16) == key:
                         self.stack.append(self.storage[i].split(":")[1])
                         break
@@ -2298,7 +2299,7 @@ class Dbgereum:
                 i = int(self.stack.pop(), 16)
                 msg_data = ""
                 for k in range(0, 64):
-                    msg_data += self.data['msg_data'][i * 64 + k]
+                    msg_data += self.data['msg_data'][i * 2 + k]
                 self.stack.append(msg_data)
                 self.ip += 1
             except:
@@ -2647,6 +2648,7 @@ class Dbgereum:
                     return 0x1000
                 if (int(self.data['this_balance'], 16) + value) > 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:
                     return 0x1001
+                self.stack.push("0000000000000000000000000000000000000000000000000000000000000001")
                 self.ip += 1
             except:
                 print("[CALL] Smth went wrong with input :(")
